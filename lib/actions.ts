@@ -65,7 +65,7 @@ const DEFAULT_CONFIG = {
   reportProposalCost: 5,
   reportProposalApproveReward: 15,
   minUpvoterCombinedPoints: 500,
-  voteAgeDaysForDailyPoints: 3,
+  voteAgeDaysForDailyPoints: 1,
   dailyPointsCap: 50,
 }
 
@@ -221,15 +221,15 @@ export async function submitProposalAction(formData: FormData) {
       }
     }
 
-    // Check if field is locked by a pinned proposal
-    const lockedQuery = await adminDb.collection('proposals')
+    // Load existing proposals for this field to toggle off any old votes and check locking
+    const existingProposals = await adminDb.collection('proposals')
       .where('candidateId', '==', candidateId)
       .where('fieldId', '==', fieldId)
       .where('periodId', '==', periodId || '')
-      .where('pinned', '==', true)
-      .limit(1)
       .get()
-    if (!lockedQuery.empty) {
+
+    const isLocked = existingProposals.docs.some(doc => doc.data()?.pinned === true)
+    if (isLocked) {
       return { error: 'This field is locked because a proposal has been pinned by an admin.' }
     }
 
@@ -293,6 +293,7 @@ export async function submitProposalAction(formData: FormData) {
 
     // 5. Execute deduction and creation atomically in a transaction
     const proposalRef = adminDb.collection('proposals').doc()
+    const voteRef = proposalRef.collection('votes').doc(uid)
     await adminDb.runTransaction(async (transaction) => {
       // Deduct points and record contribution tracking fields
       transaction.update(userRef, {
@@ -300,7 +301,20 @@ export async function submitProposalAction(formData: FormData) {
         lastContributedAt: new Date().toISOString(),
         lastContributedFieldId: fieldId,
       })
-      // Add proposal
+
+      // Check and remove old vote if user voted on another proposal for this field
+      for (const p of existingProposals.docs) {
+        const oldVoteRef = adminDb.collection('proposals').doc(p.id).collection('votes').doc(uid)
+        const oldVoteDoc = await transaction.get(oldVoteRef)
+        if (oldVoteDoc.exists) {
+          transaction.delete(oldVoteRef)
+          transaction.update(adminDb.collection('proposals').doc(p.id), {
+            upvoteCount: FieldValue.increment(-1)
+          })
+        }
+      }
+
+      // Add proposal with upvoteCount: 1 (author automatically upvotes their own proposal)
       transaction.set(proposalRef, {
         candidateId,
         fieldId,
@@ -310,9 +324,16 @@ export async function submitProposalAction(formData: FormData) {
         authorUid: uid,
         authorDisplayName: userData?.displayName || 'Anonymous',
         createdAt: new Date().toISOString(),
-        upvoteCount: 0,
+        upvoteCount: 1,
         pinned: false,
         deletionRequested: false,
+      })
+
+      // Add the auto-upvote
+      transaction.set(voteRef, {
+        voterId: uid,
+        votedAt: new Date().toISOString(),
+        voteCountAtTime: 0,
       })
     })
 

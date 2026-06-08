@@ -288,11 +288,8 @@ export default function ProposalActions({ proposal, candidateId }: ProposalActio
               <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.5rem' }}>
                 <button 
                   type="submit" 
-                  className={`btn ${activeModal.includes('delete') || activeModal.includes('ban') ? 'btn-primary' : 'btn-primary'}`} 
-                  style={{ 
-                    flex: 1, 
-                    background: activeModal.includes('delete') || activeModal.includes('ban') ? 'var(--danger)' : 'var(--accent-primary)' 
-                  }}
+                  className={`btn ${activeModal.includes('delete') || activeModal.includes('ban') ? 'btn-danger' : 'btn-primary'}`} 
+                  style={{ flex: 1 }}
                   disabled={loading}
                 >
                   {loading ? 'Processing...' : 'Confirm'}

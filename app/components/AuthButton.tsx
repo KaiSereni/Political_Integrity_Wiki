@@ -11,18 +11,18 @@ export default function AuthButton() {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
 
   if (loading) {
-    return <div className="skeleton" style={{ width: 100, height: 36, borderRadius: 'var(--radius-xl)' }} />
+    return <div className="skeleton" style={{ width: 100, height: 36, borderRadius: 'var(--radius-sm)' }} />
   }
 
   if (user) {
     return (
       <>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <button 
+          <button
             onClick={() => setIsProfileOpen(true)}
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
+            style={{
+              display: 'flex',
+              alignItems: 'center',
               gap: '0.5rem',
               background: 'none',
               border: 'none',
@@ -39,8 +39,8 @@ export default function AuthButton() {
                 width={32}
                 height={32}
                 style={{
-                  borderRadius: '50%',
-                  border: '2px solid var(--border-color)',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '3px solid var(--border-color)',
                   objectFit: 'cover'
                 }}
               />
@@ -49,15 +49,15 @@ export default function AuthButton() {
                 style={{
                   width: 32,
                   height: 32,
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, var(--accent-primary), #7c3aed)',
+                  borderRadius: 'var(--radius-sm)',
+                  background: 'var(--accent-primary)',
                   color: 'white',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontWeight: 700,
                   fontSize: '0.875rem',
-                  border: '2px solid var(--border-color)',
+                  border: '3px solid var(--border-color)',
                 }}
               >
                 {(user.displayName || 'A').charAt(0).toUpperCase()}
@@ -75,9 +75,9 @@ export default function AuthButton() {
           </button>
         </div>
 
-        <ProfileModal 
+        <ProfileModal
           key={user.uid + '_' + isProfileOpen}
-          isOpen={isProfileOpen || !!user.isNewUser} 
+          isOpen={isProfileOpen || !!user.isNewUser}
           onClose={() => setIsProfileOpen(false)}
           isInitialSetup={!!user.isNewUser}
         />

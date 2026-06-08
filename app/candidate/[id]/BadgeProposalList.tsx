@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import { useAuth } from '@/app/components/AuthProvider'
-import { voteProposalAction, submitProposalAction } from '@/lib/actions'
+import { submitProposalAction } from '@/lib/actions'
 import { usePathname } from 'next/navigation'
 import type { Proposal } from '@/lib/types'
+import VoteButton from './proposals/[fieldId]/VoteButton'
 
 const STATUS_LABELS: Record<string, { label: string; color: string; icon: string }> = {
   pledged: { label: 'Pledged', color: 'var(--success)', icon: '✓' },
@@ -31,7 +32,7 @@ export default function BadgeProposalList({
   const sorted = [...proposals].sort((a, b) => {
     if (a.pinned && !b.pinned) return -1
     if (!a.pinned && b.pinned) return 1
-    return b.upvoteCount - a.upvoteCount || new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    return b.upvoteCount - a.upvoteCount || new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   })
 
   return (
@@ -111,20 +112,15 @@ export default function BadgeProposalList({
           const statusInfo = STATUS_LABELS[proposal.value] || { label: proposal.value, color: 'var(--text-muted)', icon: '?' }
           return (
             <div key={proposal.id} className="proposal-card" style={{ padding: '0.5rem 0.75rem' }}>
-              <form action={async (formData) => {
-                if (!user) return
-                await voteProposalAction(formData)
-              }} style={{ marginRight: '0.75rem' }}>
-                <input type="hidden" name="proposalId" value={proposal.id} />
-                <input type="hidden" name="uid" value={user?.uid || ''} />
-                <input type="hidden" name="path" value={pathname} />
-                <button type="submit" className="upvote-btn" disabled={!user || proposal.pinned}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 4l-8 8h5v8h6v-8h5z" />
-                  </svg>
-                  <span className="count" style={{ fontSize: '0.75rem' }}>{proposal.upvoteCount}</span>
-                </button>
-              </form>
+              <div style={{ marginRight: '0.75rem' }}>
+                <VoteButton 
+                  proposalId={proposal.id} 
+                  upvoteCount={proposal.upvoteCount} 
+                  isPinned={proposal.pinned}
+                  path={pathname}
+                  small
+                />
+              </div>
 
               <div className="proposal-content">
                 <div style={{ fontSize: '0.875rem', fontWeight: 600 }}>

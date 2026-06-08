@@ -577,6 +577,23 @@ def submit_proposal(req: https_fn.CallableRequest) -> dict:
     user_doc = db.collection("users").document(uid).get()
     display_name = user_doc.to_dict().get("displayName", "Anonymous") if user_doc.exists else "Anonymous"
 
+    # Remove any existing vote on a DIFFERENT proposal for the same field
+    existing_proposals = db.collection("proposals")\
+        .where(filter=FieldFilter("candidateId", "==", candidate_id))\
+        .where(filter=FieldFilter("fieldId", "==", field_id))\
+        .where(filter=FieldFilter("periodId", "==", period_id or ""))\
+        .get()
+
+    for p in existing_proposals:
+        vote_doc = db.collection("proposals").document(p.id)\
+            .collection("votes").document(uid).get()
+        if vote_doc.exists:
+            db.collection("proposals").document(p.id)\
+                .collection("votes").document(uid).delete()
+            db.collection("proposals").document(p.id).update({
+                "upvoteCount": firestore.Increment(-1)
+            })
+
     proposal_ref = db.collection("proposals").document()
     proposal_ref.set({
         "candidateId": candidate_id,
@@ -588,9 +605,16 @@ def submit_proposal(req: https_fn.CallableRequest) -> dict:
         "authorDisplayName": display_name,
         "authorIp": req.raw_request.remote_addr,
         "createdAt": datetime.now(timezone.utc).isoformat(),
-        "upvoteCount": 0,
+        "upvoteCount": 1,
         "pinned": False,
         "deletionRequested": False,
+    })
+
+    # Add the author's vote
+    proposal_ref.collection("votes").document(uid).set({
+        "voterId": uid,
+        "votedAt": datetime.now(timezone.utc).isoformat(),
+        "voteCountAtTime": 0,
     })
 
     return {"proposalId": proposal_ref.id}
@@ -960,6 +984,10 @@ def daily_credibility_update(event: scheduler_fn.ScheduledEvent) -> None:
                     if year_end and now.year > year_end:
                         continue
 
+        # Check if field is locked by a pinned proposal (obsolete community proposals in locked fields do not accrue points)
+        if _is_field_locked(candidate_id, parts[2], period_id):
+            continue
+
         # Fetch all authors/upvoters for this group to get account age and current points
         uids = set()
         for p in group:
@@ -983,12 +1011,18 @@ def daily_credibility_update(event: scheduler_fn.ScheduledEvent) -> None:
                         "points": ud.get("credibilityPoints", 0)
                     }
 
-        # Sort by upvoteCount desc, then account age (createdAt asc), then points desc
-        group.sort(key=lambda x: (
-            -x.get("upvoteCount", 0),
-            user_data_map.get(x["authorUid"], {}).get("createdAt", "2099-01-01"),
-            -user_data_map.get(x["authorUid"], {}).get("points", 0)
-        ))
+        # Sort by upvoteCount desc, then proposal createdAt desc (newest first)
+        def get_proposal_key(p):
+            upvotes = p.get("upvoteCount", 0)
+            created_at = p.get("createdAt", "2000-01-01T00:00:00")
+            try:
+                clean_dt = created_at.replace("Z", "+00:00")
+                ts = datetime.fromisoformat(clean_dt).timestamp()
+            except Exception:
+                ts = 0.0
+            return (-upvotes, -ts)
+
+        group.sort(key=get_proposal_key)
 
         top = group[0]
         combined_points = 0
@@ -1167,6 +1201,25 @@ def submit_badge_proposal(req: https_fn.CallableRequest) -> dict:
 
     # Badge proposals use the same proposals collection with fieldId = "badge_{badgeId}"
     # field_id already defined above
+    # Remove any existing vote on a DIFFERENT proposal for the same field
+    existing_proposals = db.collection("proposals")\
+        .where(filter=FieldFilter("candidateId", "==", candidate_id))\
+        .where(filter=FieldFilter("fieldId", "==", field_id))\
+        .where(filter=FieldFilter("periodId", "==", ""))\
+        .get()
+
+    for p in existing_proposals:
+        vote_doc = db.collection("proposals").document(p.id)\
+            .collection("votes").document(uid).get()
+        if vote_doc.exists:
+            db.collection("proposals").document(p.id)\
+                .collection("votes").document(uid).delete()
+            db.collection("proposals").document(p.id).update({
+                "upvoteCount": firestore.Increment(-1)
+            })
+
+    # Badge proposals use the same proposals collection with fieldId = "badge_{badgeId}"
+    # field_id already defined above
     proposal_ref = db.collection("proposals").document()
     proposal_ref.set({
         "candidateId": candidate_id,
@@ -1177,9 +1230,16 @@ def submit_badge_proposal(req: https_fn.CallableRequest) -> dict:
         "authorUid": uid,
         "authorDisplayName": display_name,
         "createdAt": datetime.now(timezone.utc).isoformat(),
-        "upvoteCount": 0,
+        "upvoteCount": 1,
         "pinned": False,
         "deletionRequested": False,
+    })
+
+    # Add the author's vote
+    proposal_ref.collection("votes").document(uid).set({
+        "voterId": uid,
+        "votedAt": datetime.now(timezone.utc).isoformat(),
+        "voteCountAtTime": 0,
     })
 
     return {"proposalId": proposal_ref.id}

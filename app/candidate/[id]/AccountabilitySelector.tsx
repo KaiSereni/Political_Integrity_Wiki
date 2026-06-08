@@ -36,13 +36,13 @@ function DonationBar({ label, amount, total, color }: { label: string; amount: n
   const validAmount = amount || 0
   const pct = total > 0 ? (validAmount / total) * 100 : 0
   return (
-    <div style={{ marginBottom: '0.5rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8125rem', marginBottom: '0.25rem' }}>
-        <span style={{ color: 'var(--text-secondary)' }}>{label}</span>
-        <span style={{ fontWeight: 600 }}>{formatCurrency(amount)} ({pct.toFixed(1)}%)</span>
+    <div style={{ marginBottom: '0.75rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8125rem', marginBottom: '0.35rem', fontFamily: 'Space Mono, monospace' }}>
+        <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{label}</span>
+        <span style={{ fontWeight: 700 }}>{formatCurrency(amount)} ({pct.toFixed(1)}%)</span>
       </div>
-      <div style={{ height: 6, background: 'var(--bg-secondary)', borderRadius: 3, overflow: 'hidden' }}>
-        <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 3 }} />
+      <div style={{ height: 10, background: 'var(--bg-secondary)', border: '2px solid var(--border-color)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
+        <div style={{ height: '100%', width: `${pct}%`, background: color }} />
       </div>
     </div>
   )
@@ -110,57 +110,72 @@ export default function AccountabilitySelector({
 
       {/* Financial Summary */}
       <div className="stats-grid" style={{ marginBottom: '1.5rem' }}>
-        <div className="card stat-card" style={selected.totalRaised === undefined && selected.proposedValues?.['total_raised'] ? { border: '1px dashed var(--warning)' } : undefined}>
+        <div className="card stat-card" style={{
+          borderLeft: '8px solid var(--accent-primary)',
+          borderColor: (selected.totalRaised === undefined && selected.proposedValues?.['total_raised']) ? 'var(--warning)' : undefined
+        }}>
           <div className="stat-value">{formatCurrency(selected.totalRaised)}</div>
           {selected.totalRaised === undefined && selected.proposedValues?.['total_raised'] && (
-            <div style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.25rem', fontWeight: 600 }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.25rem', fontWeight: 600, fontFamily: 'Space Mono, monospace' }}>
               Proposed: {formatCurrency(parseFloat(selected.proposedValues['total_raised']))} (unverified)
             </div>
           )}
           <div className="stat-label">Total Raised</div>
         </div>
-        <div className="card stat-card" style={selected.totalPacMoney === undefined && selected.proposedValues?.['total_pac_money'] ? { border: '1px dashed var(--warning)' } : undefined}>
+        <div className="card stat-card" style={{
+          borderLeft: '8px solid var(--warning)',
+          borderColor: (selected.totalPacMoney === undefined && selected.proposedValues?.['total_pac_money']) ? 'var(--warning)' : undefined
+        }}>
           <div className="stat-value">{formatCurrency(selected.totalPacMoney)}</div>
           {selected.totalPacMoney === undefined && selected.proposedValues?.['total_pac_money'] && (
-            <div style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.25rem', fontWeight: 600 }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.25rem', fontWeight: 600, fontFamily: 'Space Mono, monospace' }}>
               Proposed: {formatCurrency(parseFloat(selected.proposedValues['total_pac_money']))} (unverified)
             </div>
           )}
           <div className="stat-label">Total PAC Money</div>
         </div>
-        <div className="card stat-card" style={selected.corporatePacMoney === undefined && selected.proposedValues?.['corporate_pac_money'] ? { border: '1px dashed var(--warning)' } : undefined}>
+        <div className="card stat-card" style={{
+          borderLeft: `8px solid ${selected.corporatePacMoney === 0 ? 'var(--success)' : 'var(--danger)'}`,
+          borderColor: (selected.corporatePacMoney === undefined && selected.proposedValues?.['corporate_pac_money']) ? 'var(--warning)' : undefined
+        }}>
           <div className={`stat-value ${selected.corporatePacMoney === 0 ? 'green' : ''}`}>
             {formatCurrency(selected.corporatePacMoney)}
           </div>
           {selected.corporatePacMoney === undefined && selected.proposedValues?.['corporate_pac_money'] && (
-            <div style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.25rem', fontWeight: 600 }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.25rem', fontWeight: 600, fontFamily: 'Space Mono, monospace' }}>
               Proposed: {formatCurrency(parseFloat(selected.proposedValues['corporate_pac_money']))} (unverified)
             </div>
           )}
           <div className="stat-label">
             Corporate PAC Money
             {selected.corporatePacMoney === undefined && (
-              <span style={{ display: 'block', fontSize: '0.625rem', color: 'var(--text-muted)', fontWeight: 400, marginTop: '0.125rem' }}>
+              <span style={{ display: 'block', fontSize: '0.625rem', color: 'var(--text-muted)', fontWeight: 400, marginTop: '0.125rem', fontFamily: 'Space Mono, monospace' }}>
                 Community-contributed
               </span>
             )}
           </div>
         </div>
-        <div className="card stat-card" style={selected.peakStockValue === undefined && selected.proposedValues?.['peak_stock_value'] ? { border: '1px dashed var(--warning)' } : undefined}>
+        <div className="card stat-card" style={{
+          borderLeft: `8px solid ${selected.peakStockValue === 0 ? 'var(--success)' : 'var(--danger)'}`,
+          borderColor: (selected.peakStockValue === undefined && selected.proposedValues?.['peak_stock_value']) ? 'var(--warning)' : undefined
+        }}>
           <div className={`stat-value ${selected.peakStockValue === 0 ? 'green' : ''}`}>
             {formatCurrency(selected.peakStockValue)}
           </div>
           {selected.peakStockValue === undefined && selected.proposedValues?.['peak_stock_value'] && (
-            <div style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.25rem', fontWeight: 600 }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.25rem', fontWeight: 600, fontFamily: 'Space Mono, monospace' }}>
               Proposed: {formatCurrency(parseFloat(selected.proposedValues['peak_stock_value']))} (unverified)
             </div>
           )}
           <div className="stat-label">Peak Stock Value</div>
         </div>
-        <div className="card stat-card" style={selected.peakNetAssets === undefined && selected.proposedValues?.['peak_net_assets'] ? { border: '1px dashed var(--warning)' } : undefined}>
+        <div className="card stat-card" style={{
+          borderLeft: '8px solid #8B5CF6',
+          borderColor: (selected.peakNetAssets === undefined && selected.proposedValues?.['peak_net_assets']) ? 'var(--warning)' : undefined
+        }}>
           <div className="stat-value">{formatCurrency(selected.peakNetAssets)}</div>
           {selected.peakNetAssets === undefined && selected.proposedValues?.['peak_net_assets'] && (
-            <div style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.25rem', fontWeight: 600 }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.25rem', fontWeight: 600, fontFamily: 'Space Mono, monospace' }}>
               Proposed: {formatCurrency(parseFloat(selected.proposedValues['peak_net_assets']))} (unverified)
             </div>
           )}
@@ -169,86 +184,86 @@ export default function AccountabilitySelector({
       </div>
 
       {/* Additional Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', marginBottom: '1.5rem' }}>
-        <div className="card" style={{ padding: '1rem', borderLeft: '4px solid var(--accent-primary)' }}>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Small Donor Strength</div>
-          <div style={{ fontWeight: 700, marginTop: '0.25rem', fontSize: '1.25rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+        <div className="card" style={{ padding: '1.25rem', borderLeft: '8px solid var(--accent-primary)' }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Space Mono, monospace', fontWeight: 700 }}>Small Donor Strength</div>
+          <div style={{ fontWeight: 700, marginTop: '0.5rem', fontSize: '1.5rem', fontFamily: 'Space Mono, monospace' }}>
             {sizeTotal > 0 ? `${((donationSize.under200 || 0) / sizeTotal * 100).toFixed(1)}%` : 'Unknown'}
           </div>
-          <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginTop: '0.125rem' }}>Donations under $200</div>
+          <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', marginTop: '0.25rem', fontFamily: 'Space Mono, monospace' }}>Donations under $200</div>
         </div>
 
-        <div className="card" style={{ padding: '1rem', borderLeft: '4px solid var(--success)' }}>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Local Support Index</div>
-          <div style={{ fontWeight: 700, marginTop: '0.25rem', fontSize: '1.25rem' }}>
+        <div className="card" style={{ padding: '1.25rem', borderLeft: '8px solid var(--success)' }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Space Mono, monospace', fontWeight: 700 }}>Local Support Index</div>
+          <div style={{ fontWeight: 700, marginTop: '0.5rem', fontSize: '1.5rem', fontFamily: 'Space Mono, monospace' }}>
             {locTotal > 0 ? `${((donationLocation.inState || 0) / locTotal * 100).toFixed(1)}%` : 'Unknown'}
           </div>
-          <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginTop: '0.125rem' }}>In-state vs. Out-of-state</div>
+          <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', marginTop: '0.25rem', fontFamily: 'Space Mono, monospace' }}>In-state vs. Out-of-state</div>
         </div>
 
-        <div className="card" style={{ padding: '1rem', borderLeft: `4px solid ${selected.corporatePacMoney === 0 ? 'var(--success)' : (selected.corporatePacMoney === undefined ? 'var(--text-secondary)' : 'var(--danger)')}` }}>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Corporate PAC Index</div>
-          <div style={{ fontWeight: 700, marginTop: '0.25rem', fontSize: '1.25rem', color: selected.corporatePacMoney === 0 ? 'var(--success)' : (selected.corporatePacMoney === undefined ? 'var(--text-secondary)' : 'var(--danger)') }}>
+        <div className="card" style={{ padding: '1.25rem', borderLeft: `8px solid ${selected.corporatePacMoney === 0 ? 'var(--success)' : (selected.corporatePacMoney === undefined ? 'var(--text-secondary)' : 'var(--danger)')}` }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Space Mono, monospace', fontWeight: 700 }}>Corporate PAC Index</div>
+          <div style={{ fontWeight: 700, marginTop: '0.5rem', fontSize: '1.5rem', color: selected.corporatePacMoney === 0 ? 'var(--success)' : (selected.corporatePacMoney === undefined ? 'var(--text-secondary)' : 'var(--danger)'), fontFamily: 'Space Mono, monospace' }}>
             {selected.totalRaised != null && selected.totalRaised > 0 && selected.corporatePacMoney != null
               ? `${(selected.corporatePacMoney / selected.totalRaised * 100).toFixed(1)}%` 
               : 'Unknown'}
           </div>
-          <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginTop: '0.125rem' }}>Share of total raised</div>
+          <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', marginTop: '0.25rem', fontFamily: 'Space Mono, monospace' }}>Share of total raised</div>
         </div>
 
         {['president', 'vice_president', 'cabinet', 'senator', 'representative'].includes(selected.position) && (
-          <div className="card" style={{ padding: '1rem', borderLeft: `4px solid ${selected.stockTradingVolume === 0 ? 'var(--success)' : 'var(--warning)'}` }}>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Stock Volume</div>
-            <div style={{ fontWeight: 700, marginTop: '0.25rem', fontSize: '1.25rem', color: selected.stockTradingVolume === 0 ? 'var(--success)' : 'var(--text-primary)' }}>
+          <div className="card" style={{ padding: '1.25rem', borderLeft: `8px solid ${selected.stockTradingVolume === 0 ? 'var(--success)' : 'var(--warning)'}` }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Space Mono, monospace', fontWeight: 700 }}>Stock Volume</div>
+            <div style={{ fontWeight: 700, marginTop: '0.5rem', fontSize: '1.5rem', color: selected.stockTradingVolume === 0 ? 'var(--success)' : 'var(--text-primary)', fontFamily: 'Space Mono, monospace' }}>
               {formatCurrency(selected.stockTradingVolume)}
             </div>
             {selected.stockTradingVolume === undefined && selected.proposedValues?.['stock_trading_volume'] && (
-              <div style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.25rem', fontWeight: 600 }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.25rem', fontWeight: 600, fontFamily: 'Space Mono, monospace' }}>
                 Proposed: {formatCurrency(parseFloat(selected.proposedValues['stock_trading_volume']))} (unverified)
               </div>
             )}
-            <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginTop: '0.125rem' }}>Traded while in office</div>
+            <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', marginTop: '0.25rem', fontFamily: 'Space Mono, monospace' }}>Traded while in office</div>
           </div>
         )}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
         {!['state_supreme_court_justice', 'appellate_court_judge', 'trial_court_judge'].includes(selected.position) && (
-          <div className="card" style={{ padding: '1rem' }}>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Party</div>
-            <div style={{ fontWeight: 700, marginTop: '0.25rem' }}>{selected.party || 'Unknown'}</div>
+          <div className="card" style={{ padding: '1.25rem' }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Space Mono, monospace', fontWeight: 700 }}>Party</div>
+            <div style={{ fontWeight: 700, marginTop: '0.5rem', fontFamily: 'Space Mono, monospace', fontSize: '1.125rem' }}>{selected.party || 'Unknown'}</div>
             {selected.party === undefined && selected.proposedValues?.['party'] && (
-              <div style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.25rem', fontWeight: 600 }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.25rem', fontWeight: 600, fontFamily: 'Space Mono, monospace' }}>
                 Proposed: {selected.proposedValues['party']} (unverified)
               </div>
             )}
           </div>
         )}
         {!['president', 'vice_president', 'cabinet'].includes(selected.position) && (
-          <div className="card" style={{ padding: '1rem' }}>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Region</div>
-            <div style={{ fontWeight: 700, marginTop: '0.25rem' }}>{selected.region || 'Unknown'}</div>
+          <div className="card" style={{ padding: '1.25rem' }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Space Mono, monospace', fontWeight: 700 }}>Region</div>
+            <div style={{ fontWeight: 700, marginTop: '0.5rem', fontFamily: 'Space Mono, monospace', fontSize: '1.125rem' }}>{selected.region || 'Unknown'}</div>
             {selected.region === undefined && selected.proposedValues?.['region'] && (
-              <div style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.25rem', fontWeight: 600 }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.25rem', fontWeight: 600, fontFamily: 'Space Mono, monospace' }}>
                 Proposed: {selected.proposedValues['region']} (unverified)
               </div>
             )}
           </div>
         )}
-        <div className="card" style={{ padding: '1rem' }}>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Earmarked Money</div>
-          <div style={{ fontWeight: 700, marginTop: '0.25rem' }}>{formatCurrency(selected.earmarkedMoney)}</div>
+        <div className="card" style={{ padding: '1.25rem' }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Space Mono, monospace', fontWeight: 700 }}>Earmarked Money</div>
+          <div style={{ fontWeight: 700, marginTop: '0.5rem', fontFamily: 'Space Mono, monospace', fontSize: '1.125rem' }}>{formatCurrency(selected.earmarkedMoney)}</div>
           {selected.earmarkedMoney === undefined && selected.proposedValues?.['earmarked_money'] && (
-            <div style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.25rem', fontWeight: 600 }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.25rem', fontWeight: 600, fontFamily: 'Space Mono, monospace' }}>
               Proposed: {formatCurrency(parseFloat(selected.proposedValues['earmarked_money']))} (unverified)
             </div>
           )}
         </div>
-        <div className="card" style={{ padding: '1rem' }}>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>AIPAC Money</div>
-          <div style={{ fontWeight: 700, marginTop: '0.25rem' }}>{formatCurrency(selected.aipacMoney)}</div>
+        <div className="card" style={{ padding: '1.25rem' }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Space Mono, monospace', fontWeight: 700 }}>AIPAC Money</div>
+          <div style={{ fontWeight: 700, marginTop: '0.5rem', fontFamily: 'Space Mono, monospace', fontSize: '1.125rem' }}>{formatCurrency(selected.aipacMoney)}</div>
           {selected.aipacMoney === undefined && selected.proposedValues?.['aipac_money'] && (
-            <div style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.25rem', fontWeight: 600 }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.25rem', fontWeight: 600, fontFamily: 'Space Mono, monospace' }}>
               Proposed: {formatCurrency(parseFloat(selected.proposedValues['aipac_money']))} (unverified)
             </div>
           )}

@@ -34,7 +34,7 @@ export const DEFAULT_CONFIG: PointsConfig = {
   reportProposalCost: 5,
   reportProposalApproveReward: 15,
   minUpvoterCombinedPoints: 500,
-  voteAgeDaysForDailyPoints: 3,
+  voteAgeDaysForDailyPoints: 1,
   dailyPointsCap: 10,
 }
 

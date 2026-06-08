@@ -13,7 +13,7 @@ REPORT_PERIOD_APPROVE_REWARD = 400
 REPORT_PROPOSAL_COST = 5
 REPORT_PROPOSAL_APPROVE_REWARD = 15
 MIN_UPVOTER_COMBINED_POINTS = 500
-VOTE_AGE_DAYS_FOR_DAILY_POINTS = 3
+VOTE_AGE_DAYS_FOR_DAILY_POINTS = 1
 DAILY_POINTS_CAP = 50
 
 def calculate_daily_points(vote_count_at_time_of_vote: int, is_original_poster: bool) -> int:
@@ -37,5 +37,5 @@ def can_earn_points(vote_timestamp_iso: str) -> bool:
     which is required before points start accruing.
     """
     from datetime import datetime, timezone, timedelta
-    vote_time = datetime.fromisoformat(vote_timestamp_iso)
+    vote_time = datetime.fromisoformat(vote_timestamp_iso.replace("Z", "+00:00"))
     return datetime.now(timezone.utc) >= vote_time + timedelta(days=VOTE_AGE_DAYS_FOR_DAILY_POINTS)

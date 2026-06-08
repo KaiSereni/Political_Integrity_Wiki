@@ -203,8 +203,7 @@ export async function getProposals(
   // Sort proposals according to the tiebreaker rules:
   // 0. Pinned proposals first
   // 1. Upvote count descending
-  // 2. Author account age ascending (older first)
-  // 3. Author credibility points descending
+  // 2. Proposal creation date descending (newest first)
   proposals.sort((a, b) => {
     if (a.pinned && !b.pinned) return -1
     if (!a.pinned && b.pinned) return 1
@@ -212,15 +211,9 @@ export async function getProposals(
     const votesDiff = (b.upvoteCount || 0) - (a.upvoteCount || 0)
     if (votesDiff !== 0) return votesDiff
 
-    const authorA = userProfileCache.get(a.authorUid) || { createdAt: '2099-01-01', credibilityPoints: 0 }
-    const authorB = userProfileCache.get(b.authorUid) || { createdAt: '2099-01-01', credibilityPoints: 0 }
-
-    const dateA = new Date(authorA.createdAt).getTime()
-    const dateB = new Date(authorB.createdAt).getTime()
-    const ageDiff = dateA - dateB
-    if (ageDiff !== 0) return ageDiff
-
-    return authorB.credibilityPoints - authorA.credibilityPoints
+    const dateA = new Date(a.createdAt).getTime()
+    const dateB = new Date(b.createdAt).getTime()
+    return dateB - dateA
   })
 
   return proposals
@@ -236,55 +229,7 @@ export async function getTopProposalValue(
     if (proposals.length === 0) return ''
 
     const top = proposals[0]
-
-    // Check if combined credibility of upvoters >= 500
-    if (top.pinned) return top.value
-
-    const votesSnapshot = await adminDb
-      .collection('proposals')
-      .doc(top.id)
-      .collection('votes')
-      .get()
-
-    if (votesSnapshot.empty) return ''
-
-    const voterIds = votesSnapshot.docs.map(doc => doc.id)
-    
-    // Find voter IDs not in local cache
-    const uncachedVoterIds = voterIds.filter(id => !userCredibilityCache.has(id))
-    
-    if (uncachedVoterIds.length > 0) {
-      const userRefs = uncachedVoterIds.map(id => adminDb.collection('users').doc(id))
-      // Fetch uncached users in a single batch read
-      const userDocs = await adminDb.getAll(...userRefs)
-      for (const doc of userDocs) {
-        const points = doc.exists ? (doc.data()?.credibilityPoints || 0) : 0
-        userCredibilityCache.set(doc.id, points)
-      }
-      // Any uncached IDs that don't exist in Firestore should also be cached as 0
-      for (const id of uncachedVoterIds) {
-        if (!userCredibilityCache.has(id)) {
-          userCredibilityCache.set(id, 0)
-        }
-      }
-    }
-
-    let combinedPoints = 0
-    for (const id of voterIds) {
-      combinedPoints += userCredibilityCache.get(id) || 0
-    }
-
-    let minPoints = 500
-    try {
-      const configDoc = await adminDb.collection('system').doc('points_config').get()
-      if (configDoc.exists) {
-        minPoints = configDoc.data()?.minUpvoterCombinedPoints ?? 500
-      }
-    } catch (configErr) {
-      console.error('Failed to load points config in getTopProposalValue, using default 500:', configErr)
-    }
-
-    return combinedPoints >= minPoints ? top.value : ''
+    return top.value
   } catch (error) {
     console.error(`Error in getTopProposalValue for candidate ${candidateId}, field ${fieldId}:`, error)
     return ''

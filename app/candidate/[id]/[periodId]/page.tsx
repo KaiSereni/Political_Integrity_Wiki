@@ -26,7 +26,7 @@ export default async function CandidatePeriodPage(props: { params: Promise<{ id:
   const periods = await getAccountabilityPeriods(id)
   const visiblePeriods = periods.filter(p => !p.isHidden)
   const selectedPeriod = visiblePeriods.find(p => p.id === periodId)
-  
+
   // If periodId is invalid, we could redirect or show 404. 
   // Let's show 404 for clarity if they hit a specific URL that doesn't exist.
   if (!selectedPeriod && visiblePeriods.length > 0) notFound()
@@ -45,9 +45,9 @@ export default async function CandidatePeriodPage(props: { params: Promise<{ id:
 
   // Check if any badge is "unkept" — if so, all other badges become greyed
   const hasUnkeptBadge = badgeData.some((bd) => bd.topStatus === 'unkept')
-  
+
   // Check if candidate has ever held a non-national, non-judicial position for contact info display
-  const hasEligibleContactPosition = visiblePeriods.some(p => 
+  const hasEligibleContactPosition = visiblePeriods.some(p =>
     !['president', 'vice_president', 'cabinet'].includes(p.position) &&
     !['state_supreme_court_justice', 'appellate_court_judge', 'trial_court_judge'].includes(p.position)
   )
@@ -171,10 +171,10 @@ export default async function CandidatePeriodPage(props: { params: Promise<{ id:
               ⚠ This candidate has broken a pledge. All other badges are now unreliable.
             </p>
           )}
-          <BadgeSection 
-            candidateId={id} 
-            badgeData={badgeData} 
-            hasUnkeptBadge={hasUnkeptBadge} 
+          <BadgeSection
+            candidateId={id}
+            badgeData={badgeData}
+            hasUnkeptBadge={hasUnkeptBadge}
           />
         </section>
 
@@ -271,19 +271,19 @@ export default async function CandidatePeriodPage(props: { params: Promise<{ id:
           {/* Legend */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-              <span style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--danger)', flexShrink: 0, display: 'inline-block' }} />
+              <span style={{ width: 10, height: 10, borderRadius: 'var(--radius-sm)', background: 'var(--danger)', flexShrink: 0, display: 'inline-block' }} />
               Needs a proposal
             </span>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-              <span style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--warning)', flexShrink: 0, display: 'inline-block' }} />
+              <span style={{ width: 10, height: 10, borderRadius: 'var(--radius-sm)', background: 'var(--warning)', flexShrink: 0, display: 'inline-block' }} />
               Proposal made — needs more votes
             </span>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-              <span style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--accent-secondary)', flexShrink: 0, display: 'inline-block' }} />
+              <span style={{ width: 10, height: 10, borderRadius: 'var(--radius-sm)', background: 'var(--accent-secondary)', flexShrink: 0, display: 'inline-block' }} />
               Well-supported proposal
             </span>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-              <span style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--success)', flexShrink: 0, display: 'inline-block' }} />
+              <span style={{ width: 10, height: 10, borderRadius: 'var(--radius-sm)', background: 'var(--success)', flexShrink: 0, display: 'inline-block' }} />
               FEC verified
             </span>
           </div>
@@ -293,15 +293,15 @@ export default async function CandidatePeriodPage(props: { params: Promise<{ id:
               .filter((f) => selectedPeriod && f.applicablePositions.includes(selectedPeriod.position))
               .map((field) => {
                 const isFecLocked = field.fecAutoFill && selectedPeriod?.fecDataFetched
-                
+
                 if (isFecLocked) {
                   return (
-                    <div 
-                      key={field.id} 
-                      className="card" 
-                      style={{ 
-                        opacity: 0.7, 
-                        padding: '1rem', 
+                    <div
+                      key={field.id}
+                      className="card"
+                      style={{
+                        opacity: 0.7,
+                        padding: '1rem',
                         cursor: 'not-allowed',
                         borderStyle: 'dashed',
                         borderColor: 'var(--success-muted)'
@@ -312,7 +312,7 @@ export default async function CandidatePeriodPage(props: { params: Promise<{ id:
                           <span
                             title="FEC verified"
                             style={{
-                              width: 10, height: 10, borderRadius: '50%',
+                              width: 10, height: 10, borderRadius: 'var(--radius-sm)',
                               background: 'var(--success)',
                               flexShrink: 0, display: 'inline-block',
                             }}
@@ -332,13 +332,13 @@ export default async function CandidatePeriodPage(props: { params: Promise<{ id:
 
                 const status: FieldProposalStatus = fieldStatuses[field.id] ?? 'none'
                 const dotColor =
-                  status === 'none'          ? 'var(--danger)' :
-                  status === 'low_upvotes'   ? 'var(--warning)' :
-                                              'var(--accent-secondary)'
+                  status === 'none' ? 'var(--danger)' :
+                    status === 'low_upvotes' ? 'var(--warning)' :
+                      'var(--accent-secondary)'
                 const dotTitle =
-                  status === 'none'          ? 'No proposals yet — be the first!' :
-                  status === 'low_upvotes'   ? 'Proposal made — needs more votes (fewer than 3 upvotes)' :
-                                              'Well-supported proposal (3+ upvotes)'
+                  status === 'none' ? 'No proposals yet — be the first!' :
+                    status === 'low_upvotes' ? 'Proposal made — needs more votes (fewer than 3 upvotes)' :
+                      'Well-supported proposal (3+ upvotes)'
 
                 return (
                   <Link
@@ -351,7 +351,7 @@ export default async function CandidatePeriodPage(props: { params: Promise<{ id:
                       <span
                         title={dotTitle}
                         style={{
-                          width: 10, height: 10, borderRadius: '50%',
+                          width: 10, height: 10, borderRadius: 'var(--radius-sm)',
                           background: dotColor,
                           flexShrink: 0, display: 'inline-block',
                         }}

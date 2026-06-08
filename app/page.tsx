@@ -84,20 +84,20 @@ export default async function HomePage(props: { searchParams: Promise<{ level?: 
           </h2>
 
           <div className="segment-container" style={{ marginBottom: '1.5rem' }}>
-            <Link 
-              href="/?level=federal" 
+            <Link
+              href="/?level=federal"
               className={`segment-btn ${selectedLevel === 'federal' ? 'active' : ''}`}
             >
               Federal
             </Link>
-            <Link 
-              href="/?level=state" 
+            <Link
+              href="/?level=state"
               className={`segment-btn ${selectedLevel === 'state' ? 'active' : ''}`}
             >
               State
             </Link>
-            <Link 
-              href="/?level=local" 
+            <Link
+              href="/?level=local"
               className={`segment-btn ${selectedLevel === 'local' ? 'active' : ''}`}
             >
               Local
@@ -206,12 +206,12 @@ export default async function HomePage(props: { searchParams: Promise<{ level?: 
                           )}
                         </div>
                       </div>
-                      
+
                       {c.topFields && Object.keys(c.topFields).length > 0 && (
-                        <div style={{ 
-                          marginTop: '0.25rem', 
-                          paddingTop: '0.75rem', 
-                          borderTop: '1px solid var(--border-color)',
+                        <div style={{
+                          marginTop: '0.25rem',
+                          paddingTop: '0.75rem',
+                          borderTop: '2px solid var(--border-color)',
                           fontSize: '0.75rem',
                           display: 'flex',
                           flexDirection: 'column',
@@ -294,14 +294,14 @@ export default async function HomePage(props: { searchParams: Promise<{ level?: 
         <section className="contribution-banner">
           <h2>Help us map political integrity</h2>
           <p>
-            The Integrity Wiki is an open-source project. You can help us by contributing data, 
+            The Integrity Wiki is an open-source project. You can help us by contributing data,
             verifying citations, or helping with the codebase on GitHub.
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-            <a 
-              href="https://github.com/KaiSereni/political_integrity_wiki" 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <a
+              href="https://github.com/KaiSereni/political_integrity_wiki"
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn btn-primary"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
